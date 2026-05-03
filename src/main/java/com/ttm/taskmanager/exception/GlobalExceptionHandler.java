@@ -57,18 +57,21 @@ public class GlobalExceptionHandler {
         });
 
         ValidationErrorResponse response = new ValidationErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation failed",
-            errors,
-            LocalDateTime.now()
-        );
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation failed",
+                errors,
+                LocalDateTime.now());
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unexpected error: ", ex);
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        // return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error
+        // occurred");
+        return buildResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage());
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message) {
@@ -76,8 +79,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(response);
     }
 
-    public record ErrorResponse(int status, String message, LocalDateTime timestamp) {}
+    public record ErrorResponse(int status, String message, LocalDateTime timestamp) {
+    }
 
     public record ValidationErrorResponse(int status, String message,
-                                          Map<String, String> errors, LocalDateTime timestamp) {}
+            Map<String, String> errors, LocalDateTime timestamp) {
+    }
 }
